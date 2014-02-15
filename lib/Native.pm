@@ -9,7 +9,8 @@ Log::Log4perl->easy_init($DEBUG);
 
 
 # configs
-my ($run_awe, @client_addrs, $server_addr, $server_port, $min_clients, $cfg, $url);
+my ($key_file, $run_awe, @client_addrs, $server_addr,
+    $server_port, $min_clients, $cfg, $url);
 if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     INFO "reading config from $ENV{KB_DEPLOYMENT_CONFIG}";
     $cfg = new Config::Simple($ENV{KB_DEPLOYMENT_CONFIG}) or
@@ -19,17 +20,19 @@ if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $server_port = $cfg->param("awe_monitor.server-port");
     $min_clients = $cfg->param("awe_monitor.min-clients");
     $run_awe     = $cfg->param("awe_monitor.remote-script");
+    $key_file    = $cfg->param("awe_monitor.key-file");
     $url = "http://$server_addr:$server_port";
 }
-elsif (-e "../deploy.cfg") {
-    INFO "reading config from ../deploy.cfg";
-    $cfg = new Config::Simple("../deploy.cfg") or
+elsif (-e "./deploy.cfg") {
+    INFO "reading config from ./deploy.cfg";
+    $cfg = new Config::Simple("./deploy.cfg") or
         die "could not construct new Config::Simple object";
     @client_addrs = $cfg->param("awe_monitor.client-addrs");
     $server_addr = $cfg->param("awe_monitor.server-addr");
     $server_port = $cfg->param("awe_monitor.server-port");
     $min_clients = $cfg->param("awe_monitor.min-clients");
     $run_awe     = $cfg->param("awe_monitor.remote-script");
+    $key_file    = $cfg->param("awe_monitor.key-file");
     $url = "http://$server_addr:$server_port";
 }
 else {
@@ -70,6 +73,7 @@ sub launch {
 	foreach (keys %missing) { $target = $_ if $missing{$_} > $val }
 
 	INFO "starting a client on $target";
-	#system ("ssh", "$target", "$run_awe");	
+	INFO "ssh -i $key_file $target $run_awe";
+	#system ("ssh", "-i", "$key-file", "$target", "$run_awe");	
 
 }
