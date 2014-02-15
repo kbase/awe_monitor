@@ -1,6 +1,6 @@
 use Config::Simple;
 use Log::Log4perl qw(:easy);
-use lib qw(.);
+use lib qw(./lib);
 use AWE;
 use strict;
 my (@client_addrs, $server_addr, $server_port, $min_clients, $cfg);
@@ -22,9 +22,9 @@ if (defined $ENV{KB_DEPLOYMENT_CONFIG} && -e $ENV{KB_DEPLOYMENT_CONFIG}) {
     $min_clients = $cfg->param("awe_monitor.min-clients");
     $url = "http://$server_addr:$server_port";
 }
-elsif (-e "../deploy.cfg") {
-    INFO "reading config from ../deploy.cfg";
-    $cfg = new Config::Simple("../deploy.cfg") or
+elsif (-e "./deploy.cfg") {
+    INFO "reading config from ./deploy.cfg";
+    $cfg = new Config::Simple("./deploy.cfg") or
         die "could not construct new Config::Simple object";
     @client_addrs = $cfg->param("awe_monitor.client-addrs");
     $server_addr = $cfg->param("awe_monitor.server-addr");
